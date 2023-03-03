@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "importHelpers": true,
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "noErrorTruncation": true,
+    "strict": true,
+    "sourceMap": true,
+    "target": "ESNext",
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  }
+}
