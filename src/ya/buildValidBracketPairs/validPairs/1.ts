@@ -1,1 +1,4 @@
-export const pair_1 = ['()'];
+export const pair_1 = [
+  //
+  '()',
+];

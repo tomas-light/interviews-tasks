@@ -114,3 +114,69 @@ describe('getShortestRoutes', () => {
     expect(shortestRoute).toBe(-1);
   });
 });
+
+test('tree observe', () => {
+  type TreeNode = {
+    value: number;
+    children?: TreeNode[];
+  };
+
+  function dump(tree: { value: number; children?: TreeNode[] }): number[] {
+    const values = [tree.value];
+
+    if (!tree.children) {
+      return values;
+    }
+
+    handleTreeChildren(tree.children);
+
+    function handleTreeChildren(nodes: TreeNode[]) {
+      if (!nodes.length) {
+        return;
+      }
+
+      const nextNodes: TreeNode[] = [];
+
+      nodes.forEach((node) => {
+        values.push(node.value);
+
+        if (!node.children) {
+          return;
+        }
+
+        nextNodes.push(...node.children);
+      });
+
+      handleTreeChildren(nextNodes);
+    }
+
+    return values;
+  }
+
+  const result = dump({
+    value: 1,
+    children: [
+      {
+        value: 2,
+        children: [
+          {
+            value: 4,
+          },
+          {
+            value: 5,
+          },
+        ],
+      },
+      {
+        value: 3,
+        children: [
+          {
+            value: 6,
+          },
+        ],
+      },
+    ],
+  });
+
+  expect(result).toEqual([1, 2, 3, 4, 5, 6]);
+});
