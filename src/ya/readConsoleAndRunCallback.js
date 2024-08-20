@@ -29,90 +29,199 @@ const rl = readline.createInterface({
   input: process.stdin,
 });
 
-let bracketPairsNumber = 0;
+// let bracketPairsNumber = 0;
+//
+// rl.on('line', (line) => {
+//   bracketPairsNumber = parseInt(line, 10);
+// }).on('close', () => {
+//   const LEFT_BRACKET = '(';
+//   const RIGHT_BRACKET = ')';
+//
+//   if (bracketPairsNumber === 0) {
+//     return;
+//   }
+//
+//   const targetLength = bracketPairsNumber * 2;
+//
+//   const initialString = LEFT_BRACKET;
+//   let combinations = [
+//     {
+//       string: initialString,
+//       left: initialString.length,
+//       right: 0,
+//     },
+//   ];
+//
+//   for (let brackets = initialString.length; brackets < targetLength; brackets++) {
+//     const nextCombinations = [];
+//
+//     combinations.forEach(({ string, left, right }) => {
+//       if (left < bracketPairsNumber) {
+//         nextCombinations.push({
+//           right,
+//           left: left + 1,
+//           string: string + LEFT_BRACKET,
+//         });
+//       }
+//
+//       if (right < left) {
+//         nextCombinations.push({
+//           right: right + 1,
+//           left,
+//           string: string + RIGHT_BRACKET,
+//         });
+//       }
+//     });
+//
+//     combinations = nextCombinations;
+//   }
+//
+//   combinations.forEach((line) => {
+//     process.stdout.write(`${line.string.toString()}\n`);
+//   });
+// });
+
+// rl.on('line', (line) => {
+//   bracketPairsNumber = parseInt(line, 10);
+// }).on('close', () => {
+//   const combinations = [];
+//   const targetLength = bracketPairsNumber * 2;
+//
+//   const leftBracket = '(';
+//   const rightBracket = ')';
+//
+//   generateString('', 0, 0);
+//   function generateString(currentString, left, right) {
+//     if (currentString.length === targetLength) {
+//       combinations.push(currentString);
+//       return;
+//     }
+//
+//     if (bracketPairsNumber > left) {
+//       generateString(currentString + leftBracket, left + 1, right);
+//     }
+//
+//     if (right < left) {
+//       generateString(currentString + rightBracket, left, right + 1);
+//     }
+//   }
+//
+//   if (combinations && Array.isArray(combinations)) {
+//     combinations.forEach((line) => {
+//       process.stdout.write(`${line.toString()}\n`);
+//     });
+//   } else {
+//     process.stdout.write(combinations.toString());
+//   }
+// });
+
+const lines = [];
 
 rl.on('line', (line) => {
-  bracketPairsNumber = parseInt(line, 10);
+  lines.push(line);
+
+  if (timer) {
+    clearTimeout(timer);
+  }
+  timer = setTimeout(() => rl.close(), 3000);
 }).on('close', () => {
-  const leftBracket = '(';
-  const rightBracket = ')';
+  const cityCountString = +lines[0];
+  const coors = [];
+  for (let index = 1; index <= cityCountString; index++) {
+    const line = lines[index];
+    const parsed = line.split(' ').map((str) => parseInt(str));
+    coors.push(parsed);
+  }
 
-  const targetLength = bracketPairsNumber * 2;
+  const travelDestination = lines[lines.length - 1];
+  const maxLengthString = lines[lines.length - 2];
 
-  const initialString = leftBracket;
-  let combinations = [
-    {
-      string: initialString,
-      left: initialString.length,
-      right: 0,
-    },
-  ];
+  const maxLength = parseInt(maxLengthString);
 
-  for (let brackets = initialString.length; brackets < targetLength; brackets++) {
-    const nextCombinations = [];
+  const shortestRoute = getShortestRoutes(coors, maxLength, travelDestination.split(' '));
+  process.stdout.write(shortestRoute.toString());
 
-    combinations.forEach(({ string, left, right }) => {
-      if (left < bracketPairsNumber) {
-        nextCombinations.push({
-          right,
-          left: left + 1,
-          string: string + leftBracket,
-        });
+  function buildRoutesNotExceedMaxLength(citiesMap, maxRouteLength) {
+    const cities = new Array(citiesMap.length).fill(undefined);
+
+    for (let index = 0; index < citiesMap.length; index++) {
+      const departmentCity = citiesMap[index];
+
+      for (let jindex = index + 1; jindex < citiesMap.length; jindex++) {
+        const destinationCity = citiesMap[jindex];
+
+        const xDiff = Math.abs(+departmentCity[0] - +destinationCity[0]);
+        const yDiff = Math.abs(+departmentCity[1] - +destinationCity[1]);
+
+        const length = xDiff + yDiff;
+
+        if (length <= maxRouteLength) {
+          let city1 = cities[index];
+          if (!city1) {
+            city1 = cities[index] = {};
+          }
+          city1[jindex] = length;
+
+          let city2 = cities[jindex];
+          if (!city2) {
+            city2 = cities[jindex] = {};
+          }
+          city2[index] = length;
+        }
+      }
+    }
+
+    return cities;
+  }
+
+  function getShortestRoutes(citiesMap, maxRouteLength, travelDirection) {
+    const [targetDepartment, targetDestination] = travelDirection;
+
+    const cities = buildRoutesNotExceedMaxLength(citiesMap, maxRouteLength);
+
+    const resultedCityRoutes = [];
+
+    const departmentCity = cities[+targetDepartment - 1];
+    if (departmentCity) {
+      tryBuildRoute(new Set(), +targetDepartment - 1);
+    }
+
+    function tryBuildRoute(prevCityIndexes, currentCityIndex) {
+      if (currentCityIndex === +targetDestination - 1) {
+        resultedCityRoutes.push(prevCityIndexes);
+        return;
       }
 
-      if (right < left) {
-        nextCombinations.push({
-          right: right + 1,
-          left,
-          string: string + rightBracket,
-        });
+      const city = cities[currentCityIndex];
+      if (!city) {
+        return;
       }
+
+      const notVisitedCities = Object.keys(city).filter((linkedCityIndex) => !prevCityIndexes.has(+linkedCityIndex));
+      if (!notVisitedCities.length) {
+        return;
+      }
+
+      const visitedCities = new Set(prevCityIndexes).add(currentCityIndex);
+
+      return notVisitedCities.map((cityIndex) => {
+        tryBuildRoute(visitedCities, +cityIndex);
+      });
+    }
+
+    if (!resultedCityRoutes.length) {
+      return -1;
+    }
+
+    const shortest = resultedCityRoutes.reduce((shortestRoute, currentRoute) => {
+      if (currentRoute.size < shortestRoute.size) {
+        return currentRoute;
+      }
+      return shortestRoute;
     });
 
-    combinations = nextCombinations;
+    return shortest?.size ?? -1;
   }
-
-  combinations.forEach((combo) => {
-    process.stdout.write(`${combo.string}\n`);
-  });
 });
 
-function mutableBitSort(array, attempt = 0, maxLength = array[0].length /* all items have same length */) {
-  if (attempt >= maxLength) {
-    return array;
-  }
-
-  let startIndex = 0;
-  const { length } = array;
-
-  for (let index = 0; index < length - 1; index++) {
-    const item = array[startIndex];
-    const bracket = item[item.length - attempt - 1];
-
-    if (bracket === ')') {
-      delete array[startIndex];
-      array.push(item);
-    }
-    startIndex++;
-  }
-
-  mutableFilter(array);
-
-  return mutableBitSort(array, attempt + 1);
-}
-
-function mutableFilter(array) {
-  let availableIndex = 0;
-  for (let index = 0; index < array.length; index++) {
-    const item = array[index];
-    if (item !== undefined) {
-      delete array[index];
-      array[availableIndex] = item;
-      availableIndex++;
-    }
-  }
-
-  array.length = availableIndex;
-
-  return array;
-}
+rl.close();

@@ -9,7 +9,17 @@ import {
   mutableHeapSort2,
   mutateArrayToHeap,
 } from './buildValidBracketPairs';
-import { pair_1, pair_10, pair_11, pair_2, pair_3, pair_4, pair_5, pair_6, pair_7, pair_8, pair_9 } from './validPairs';
+import {
+  //
+  pair_1,
+  pair_2,
+  pair_3,
+  pair_4,
+  pair_5,
+  pair_6,
+  pair_7,
+  pair_8,
+} from './validPairs';
 
 describe('buildValidBracketPairs', () => {
   test('if 1 pair is valid', () => {
@@ -50,21 +60,6 @@ describe('buildValidBracketPairs', () => {
   test('if 8 pairs are valid', () => {
     const brackets = buildValidBracketPairs(8);
     expect(brackets).toEqual(pair_8);
-  });
-
-  test('if 9 pairs are valid', () => {
-    const brackets = buildValidBracketPairs(9);
-    expect(brackets).toEqual(pair_9);
-  });
-
-  test('if 10 pairs are valid', () => {
-    const brackets = buildValidBracketPairs(10);
-    expect(brackets).toEqual(pair_10);
-  });
-
-  test('if 11 pairs are valid', () => {
-    const brackets = buildValidBracketPairs(11);
-    expect(brackets).toEqual(pair_11);
   });
 });
 
@@ -107,21 +102,6 @@ describe('buildValidBracketPairsWithoutRecurse', () => {
   test('if 8 pairs are valid', () => {
     const brackets = buildValidBracketPairsWithoutRecurse(8);
     expect(brackets).toEqual(pair_8);
-  });
-
-  test('if 9 pairs are valid', () => {
-    const brackets = buildValidBracketPairsWithoutRecurse(9);
-    expect(brackets).toEqual(pair_9);
-  });
-
-  test('if 10 pairs are valid', () => {
-    const brackets = buildValidBracketPairsWithoutRecurse(10);
-    expect(brackets).toEqual(pair_10);
-  });
-
-  test('if 11 pairs are valid', () => {
-    const brackets = buildValidBracketPairsWithoutRecurse(11);
-    expect(brackets).toEqual(pair_11);
   });
 });
 

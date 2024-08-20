@@ -13,5 +13,8 @@
     "target": "ESNext",
     "noImplicitAny": true,
     "strictNullChecks": true
-  }
+  },
+  "include": ["RedBlackTreeVisualizer.tsx",
+    "RedBlackTreeNode.ts"
+  ]
 }

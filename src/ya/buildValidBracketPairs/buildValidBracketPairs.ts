@@ -28,6 +28,10 @@ export function buildValidBracketPairs(bracketPairsNumber: number) {
 }
 
 export function buildValidBracketPairsWithoutRecurse(bracketPairsNumber: number) {
+  if (bracketPairsNumber === 0) {
+    return;
+  }
+
   const LEFT_BRACKET = '(';
   const RIGHT_BRACKET = ')';
 
@@ -45,7 +49,9 @@ export function buildValidBracketPairsWithoutRecurse(bracketPairsNumber: number)
   for (let brackets = initialString.length; brackets < targetLength; brackets++) {
     const nextCombinations = [] as typeof combinations;
 
-    combinations.forEach(({ string, left, right }) => {
+    combinations.forEach(({ string, left, right }, index) => {
+      delete combinations[index];
+
       if (left < bracketPairsNumber) {
         nextCombinations.push({
           right,
@@ -136,8 +142,10 @@ function mutableFilter<T>(array: T[]) {
   for (let index = 0; index < array.length; index++) {
     const item = array[index];
     if (item !== undefined) {
-      delete array[index];
-      array[availableIndex] = item;
+      if (index !== availableIndex) {
+        delete array[index];
+        array[availableIndex] = item;
+      }
       availableIndex++;
     }
   }
@@ -175,6 +183,19 @@ export function buildHeap<T>(array: T[], compare: (child: T, parent: T) => boole
 export function heapSort<T>(array: T[], compare: (child: T, parent: T) => boolean): T[] {
   const heap = buildHeap(array, compare);
   const newArray = [] as T[];
+
+  while (heap.length > 1) {
+    // the lest item in heap (if compare is left < right),
+    // or the greatest item in heap (if compare is left > right)
+    const heapRoot = heap[1]; // because zero index has 0
+    newArray.push(heapRoot);
+
+    const lastElement = heap.pop()!;
+    if (heap.length > 1) {
+      heap[1] = lastElement;
+      swapWithChildIfNeeded(lastElement, 1);
+    }
+  }
 
   function swapWithChildIfNeeded(item: T, itemIndex: number) {
     const leftChildIndex = itemIndex * 2;
@@ -220,19 +241,6 @@ export function heapSort<T>(array: T[], compare: (child: T, parent: T) => boolea
     }
   }
 
-  while (heap.length > 1) {
-    // the lest item in heap (if compare is left < right),
-    // or the greatest item in heap (if compare is left > right)
-    const heapRoot = heap[1]; // because zero index has 0
-    newArray.push(heapRoot);
-
-    const lastElement = heap.pop()!;
-    if (heap.length > 1) {
-      heap[1] = lastElement;
-      swapWithChildIfNeeded(lastElement, 1);
-    }
-  }
-
   return newArray;
 }
 
@@ -271,6 +279,25 @@ export function mutableHeapSort<T>(array: T[], compare: (child: T, parent: T) =>
   const newArray = heap;
 
   let index = array.length - 1;
+
+  while (index > 0) {
+    // the lest item in heap (if compare is left < right),
+    // or the greatest item in heap (if compare is left > right)
+    // is placed right after reserved zero
+
+    // swap reserved zero with next value in sorted array
+
+    const [sortedItem] = newArray.splice(1, 1);
+    newArray.splice(length, 0, sortedItem);
+
+    index--;
+
+    if (index > 0) {
+      const [lastElement] = heap.splice(index, 1);
+      heap.splice(1, 0, lastElement);
+      swapWithChildIfNeeded(lastElement, 1);
+    }
+  }
 
   function swapWithChildIfNeeded(item: T, itemIndex: number) {
     const leftChildIndex = itemIndex * 2;
@@ -313,25 +340,6 @@ export function mutableHeapSort<T>(array: T[], compare: (child: T, parent: T) =>
         [heap[rightChildIndex], heap[itemIndex]] = [heap[itemIndex], heap[rightChildIndex]];
         swapWithChildIfNeeded(item, rightChildIndex);
       }
-    }
-  }
-
-  while (index > 0) {
-    // the lest item in heap (if compare is left < right),
-    // or the greatest item in heap (if compare is left > right)
-    // is placed right after reserved zero
-
-    // swap reserved zero with next value in sorted array
-
-    const [sortedItem] = newArray.splice(1, 1);
-    newArray.splice(length, 0, sortedItem);
-
-    index--;
-
-    if (index > 0) {
-      const [lastElement] = heap.splice(index, 1);
-      heap.splice(1, 0, lastElement);
-      swapWithChildIfNeeded(lastElement, 1);
     }
   }
 

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#000000" />
+    <title>Tree</title>
+    <style>
+      .node {
+        border-radius: 50%;
+        padding: 4px;
+        width: 20px;
+        height: 20px;
+        text-align: center;
+      }
+      .node.black {
+        border: 1px solid black;
+      }
+      .node.red {
+        border: 1px solid red;
+      }
+      .node.empty {
+        border: 1px solid #bdbbbb;;
+      }
+      .nodes {
+        display: grid;
+        align-items: flex-start;
+        justify-items: center;
+        grid-auto-flow: row;
+        grid-template-rows: auto auto 1fr;
+        gap: 8px;
+      }
+      .siblings {
+        display: grid;
+        grid-auto-flow: column;
+        gap: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
