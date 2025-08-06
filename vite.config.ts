@@ -20,6 +20,7 @@ export default defineConfig({
     },
     preprocessorOptions: {
       scss: {
+        // @ts-ignore
         api: 'modern-compiler',
       },
     },
